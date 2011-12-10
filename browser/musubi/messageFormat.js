@@ -32,7 +32,7 @@ Musubi.MessageFormat.prototype.unpackMessage = function(data) {
 	json = JSON.parse(data);
 	
 	var msg = new SocialKit.SignedMessage();
-	msg.timestamp = new Date(json["timestamp"]);
+	msg.timestamp = json["timestamp"];
 	msg.feedName = json["feedName"];
 	msg.appId = json["appId"];
 	msg.parentHash = json["parentHash"];
@@ -78,7 +78,10 @@ Musubi.MessageFormat.prototype.decode = function(encoded, keyPair) {
 	var aesIV = this.consumeSegment(data, ptr);
 	var cyphered = this.consumeBigSegment(data, ptr);
 	var plain = Crypto.AES.decrypt(cyphered, aes, {iv: aesIV, mode: new Crypto.mode.CBC(Crypto.pad.pkcs7), asBytes: true})
+	
 	var msg = this.unpackMessage(Crypto.charenc.UTF8.bytesToString(plain));
+	msg.sender = new SocialKit.User({name: "", id: Crypto.util.bytesToBase64(senderKey)});
+	
 	return msg;
 };
 

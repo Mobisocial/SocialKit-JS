@@ -1,16 +1,14 @@
-Musubi.Transport = function(keyPair) {
+Musubi.AMQPTransport = function(server, keyPair) {
 	this._socket = null;
 	this._keyPair = keyPair;
-	this.init();
+	this.init(server);
 }
 
-Musubi.Transport.proxy = "localhost:8888";
-
-Musubi.Transport.prototype.init = function() {
+Musubi.AMQPTransport.prototype.init = function(server) {
 	var thisTransport = this;
 	this._listeners = []
 	
-	this._socket = new WebSocket("ws://" + Musubi.Transport.proxy + "/ws_channel");
+	this._socket = new WebSocket("ws://" + server + "/ws_channel");
 	
 	this._socket.onopen = function() {
 		console.log("Connection established");
@@ -33,6 +31,10 @@ Musubi.Transport.prototype.init = function() {
 	this.onMessage = function(listener) {
 		this._listeners.push(listener)
 	}
+};
+
+Musubi.AMQPTransport.prototype.postObj = function(obj, feedName, sender, appId) {
+	console.log(obj)
 };
 
 Musubi.EncodedMessage = function(data) {

@@ -1,0 +1,67 @@
+<html>
+<head>
+	<script type="text/javascript" src="../jquery-1.5.2.min.js"></script>
+	
+	<script type="text/javascript" src="../lib/socialKit.js"></script>
+	<script type="text/javascript" src="../lib/turnBasedGame.js"></script>
+	
+	<script type="text/javascript" src="rsa/bigint.js"> </script>
+	<script type="text/javascript" src="rsa/barrett.js"> </script>
+	<script type="text/javascript" src="rsa/rsa.js"> </script>
+	<script type="text/javascript" src="crypto-js/crypto-min.js"> </script>
+	<script type="text/javascript" src="crypto-js/crypto-sha1-hmac-pbkdf2-blockmodes-aes.js"> </script>
+	<script type="text/javascript" src="musubi/web_socket.js"> </script>
+	<script type="text/javascript" src="musubi/transport.js"> </script>
+	<script type="text/javascript" src="musubi/messageFormat.js"> </script>
+	<script type="text/javascript" src="../lib/platforms/socialKit-browser.js"></script>
+	
+	<style type="text/css">
+		body, html {
+			font-family: Helvetica;
+			font-size: 12px;
+			color: #333;
+		}
+		
+		.device {
+			border: solid 1px #999; 
+			border-radius: 10px; 
+			box-shadow: #333 1px 1px 3px; 
+			padding: 10px; 
+			float: left; 
+			margin-right: 20px;
+		}
+		
+		.device iframe {
+			width: 320px;
+			height: 480px;
+			border: solid 1px #999;
+		}
+	</style>
+</head>
+<body>
+	<div id="devices"></div>
+	
+	<div style="clear: both;"></div>
+	
+	<input type="button" onclick="addUser()" value="Add user/device" style="margin-top: 20px"/>
+	<input type="text" value="edu.stanford.mobisocial.dungbeetle" style="width: 300px"></input><input type="button" onclick="" value="Launch"/>
+	
+	<script type="text/javascript">
+		var env = new Musubi.Browser.Environment(new Musubi.Browser.InterFrameTransport('test'));
+		
+		addUser();
+		addUser();
+		
+		function addUser() {
+			var id = $(".device").length;
+			var frame = 'view' + id;
+			var user = {name: "User " + (id + 1), id: id};
+			var feed = {name: "Test", uri: "", session: "test", key: ""};
+			
+			$("#devices").append('<div class="device"><iframe name="' + frame + '"></iframe></div>');
+			env.startInstance(frame, user, feed, 'edu.stanford.mobisocial.dungbeetle');
+		}
+	</script>
+</body>
+
+</html>
