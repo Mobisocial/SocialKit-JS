@@ -3,10 +3,10 @@ addEventListener('touchmove', function(e) { e.preventDefault(); }, true);
 /*
  * WordPlay is the application's main class
  */
-function WordPlay(app) {
+function WordPlay(context) {
     this.field = null;
     this.state = {bag: null, board: null, racks: null, players: null, scores: null, first: 0, gameover: 0, initializing: 0, lastmove: "", passcount: 0};
-    this.init(app);
+    this.init(context);
 }
 WordPlay.prototype = new SocialKit.Multiplayer.TurnBasedMultiplayerGame;
 
@@ -22,7 +22,7 @@ WordPlay.TILE_VALUES = {a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j:
 
 
 // App initializations
-WordPlay.prototype.init = function(app) {    
+WordPlay.prototype.init = function(context) {    
     
     this.field = this.createField();
     
@@ -38,8 +38,70 @@ WordPlay.prototype.init = function(app) {
         $("#turn").html(this.isMyTurn() ? "It's your turn!" : "Waiting for other player.");
     });
     
-    SocialKit.Multiplayer.TurnBasedMultiplayerGame.prototype.init.call(this, app);
+    SocialKit.Multiplayer.TurnBasedMultiplayerGame.prototype.init.call(this, context);
 };
+
+WordPlay.prototype.createInitialState = function() {
+	this.state = {bag: null, board: null, racks: null, players: null, scores: null, first: 0, gameover: 0, initializing: 1, lastmove: "", passcount: 0};
+	
+	this.state.bag = ['a','a','a','a','a','a','a','a','a',
+					'b','b',
+					'c','c',
+					'd','d','d','d',
+					'e','e','e','e','e','e','e','e','e','e','e','e',
+					'f','f',
+					'g','g','g',
+					'h','h',
+					'i','i','i','i','i','i','i','i','i',
+					'j',
+					'k',
+					'l','l','l','l',
+					'm','m',
+					'n','n','n','n','n','n',
+					'o','o','o','o','o','o','o','o',
+					'p','p',
+					'q',
+					'r','r','r','r','r','r',
+					's','s','s','s',
+					't','t','t','t','t','t',
+					'u','u','u','u',
+					'v','v',
+					'w','w',
+					'x',
+					'y','y',
+					'z',
+					' ',' '];
+	
+	this.state.board = [];
+	for (var i=0; i<15; i++) {
+        this.state.board[i] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    }
+    
+    this.state.racks = [];
+    this.state.scores = [];
+    
+    for (var i in this.players) {
+    	this.state.scores.push(0);
+    	this.state.racks[i] = [];
+    	
+    	for (var p = 0; p < 7; p++) {
+    		this.state.racks[i][p] = this.takeTileFromBag();
+    	}
+    }
+    
+    return this.state;
+};
+
+WordPlay.prototype.takeTileFromBag = function() {
+	var i = -1;
+	while (i < 0 || !this.state.bag[i]) {
+		i = Math.round(Math.random() * this.state.bag.length);
+	}
+	
+	tile = this.state.bag[i];
+	delete this.state.bag[i];
+	return tile;
+}
 
 WordPlay.prototype.createField = function() {
     var __ = WordPlay.SPACE_REGULAR;
@@ -108,7 +170,7 @@ WordPlay.prototype.renderBoard = function() {
 
 WordPlay.prototype.myPlayerIndex = function() {
     for (var idx = 0; idx < this.players.length; idx++) {
-        if (this.players[idx].id == Musubi.user.id) {
+        if (this.players[idx].id == this.appContext.user.id) {
             return idx;
         }
     }
@@ -178,6 +240,6 @@ WordPlay.prototype.feedView = function() {
  * App launch when Musubi is ready
  */
 var game = null;
-Musubi.ready(function() {
-    game = new WordPlay(Musubi.app);
+Musubi.ready(function(context) {
+    game = new WordPlay(context);
 });

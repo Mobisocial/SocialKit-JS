@@ -44,22 +44,28 @@
 	<div style="clear: both;"></div>
 	
 	<input type="button" onclick="addUser()" value="Add user/device" style="margin-top: 20px"/>
-	<input type="text" value="edu.stanford.mobisocial.dungbeetle" style="width: 300px"></input><input type="button" onclick="" value="Launch"/>
+	<input type="text" id="appId" value="mobisocial.tictactoe" style="width: 300px"></input><input type="button" onclick="launch($('#appId').val())" value="Launch"/>
 	
 	<script type="text/javascript">
 		var env = new Musubi.Browser.Environment(new Musubi.Browser.InterFrameTransport('test'));
+		var feed = {name: "Test", uri: "", session: "test", key: ""};
 		
 		addUser();
 		addUser();
+		
 		
 		function addUser() {
 			var id = $(".device").length;
 			var frame = 'view' + id;
 			var user = {name: "User " + (id + 1), id: id};
-			var feed = {name: "Test", uri: "", session: "test", key: ""};
 			
 			$("#devices").append('<div class="device"><iframe name="' + frame + '"></iframe></div>');
 			env.startInstance(frame, user, feed, 'edu.stanford.mobisocial.dungbeetle');
+		}
+		
+		function launch(appId) {
+			var user = {name: "User 1", id: 0};
+			env.startInstance('view0', user, feed, appId);
 		}
 	</script>
 </body>
