@@ -93,5 +93,6 @@ TicTacToe.prototype.feedView = function() {
  */
 var game = null;
 Musubi.ready(function(context) {
+    console.info("launching tictactoe");
     game = new TicTacToe(context);
 });
