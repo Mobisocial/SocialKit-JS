@@ -4,15 +4,7 @@
         <script type="text/javascript" src="jquery.event.drag.min.js"></script>
         <script type="text/javascript" src="../../lib/socialKit.js"></script>
         <script type="text/javascript" src="../../lib/turnBasedGame.js"></script>
-        <!-- 
-		<script type="text/javascript" src="../../platform/rsa/bigint.js"> </script>
-		<script type="text/javascript" src="../../platform/rsa/barrett.js"> </script>
-		<script type="text/javascript" src="../../platform/rsa/rsa.js"> </script>
-		<script type="text/javascript" src="../../platform/crypto-js/crypto-sha1-hmac-pbkdf2-blockmodes-aes.js"> </script>
-		<script type="text/javascript" src="../../platform/musubi/web_socket.js"> </script>
-		<script type="text/javascript" src="../../platform/musubi/transport.js"> </script>
-		<script type="text/javascript" src="../../platform/musubi/messageFormat.js"> </script>
-		<script type="text/javascript" src="../../platform/socialKit-browser.js"></script> -->
+        
         <script type="text/javascript" src="app.js"></script>
         
         <style type="text/css">
@@ -28,8 +20,8 @@
             
             .tile {
                 position: absolute;
-                left: 0px;
-                top: 0px;
+                left: -1px;
+                top: -1px;
                 width: 30px;
                 height: 30px;
                 background-color: #ffcc00;
@@ -95,8 +87,11 @@
                 color: white;
             }
             
-            #board .space_start {
+            #board .space_st {
                 background-color: purple;
+                background-image: url('star.png');
+                background-repeat: no-repeat;
+                background-position: center 1px;
                 font-size: 0px;
             }
             
@@ -121,6 +116,7 @@
                 clear: both;
                 margin: auto;
                 width: 266px;
+                height: 33px;
             }
             
             #rack .spot {
@@ -129,6 +125,9 @@
                 width: 30px;
                 height: 30px;
                 margin: 0px 3px;
+                border: dotted 1px;
+                border-radius: 5px;
+                background-color: #f0f0f0;
             }
             
             #turn {
@@ -139,6 +138,13 @@
                 margin-top: 15px;
                 margin-bottom: 10px;
                 text-align: center;
+            }
+            
+            #controls div {
+            	border: solid 1px black;
+            	width: 50px;
+            	margin: 5px;
+            	float: left;
             }
             
             input {
@@ -162,6 +168,24 @@
         </div>
         
         <div id="turn">
+        </div>
+        
+        <table id="scores">
+        	
+        </table>
+        
+        <div id="controls">
+        	<div class="play" onclick="game.play()">
+        		PLAY
+        	</div>
+        	
+        	<div class="shuffle" onclick="game.shuffle()">
+        		SHUFFLE
+        	</div>
+        	
+        	<div class="swap" onclick="game.swap()">
+        		SWAP
+        	</div>
         </div>
         
         <div id="log"></div>
