@@ -16,9 +16,8 @@ TicTacToe.prototype.init = function(app) {
         $("#board").html(this.renderBoard());
         $("#turn").html(this.isMyTurn() ? "It's your turn!" : "Waiting for other player.");
     });
-    
-    SocialKit.Multiplayer.TurnBasedMultiplayerGame.prototype.init.call(this, app);
 
+    SocialKit.Multiplayer.TurnBasedMultiplayerGame.prototype.init.call(this, app);
     for (var key in this.players) {
         $("#players").append('<li>' + this.players[key].name + '</li>');
     }
@@ -42,6 +41,7 @@ TicTacToe.prototype.renderBoard = function() {
             var makeCell = function(idx) {
                 var cell = $('<td>&nbsp;' + thisGame.board[idx] + '</td>');
                 cell.click(function() {
+                    if (DBG) console.log("TTT clicked " + idx);
                     thisGame.placeToken(idx);
                 });
                 row.append(cell);
@@ -55,6 +55,11 @@ TicTacToe.prototype.renderBoard = function() {
 };
 
 TicTacToe.prototype.placeToken = function(idx) {
+    if (DBG) console.log("placing token.. " + JSON.stringify(this));
+    if (!this.isMyTurn()) {
+        if (DBG) console.log("not my turn.");
+        return;
+    }
     // only place token on empty spots
     if (this.board[idx] == "  ") {
         this.board[idx] = this.myToken;
@@ -64,6 +69,7 @@ TicTacToe.prototype.placeToken = function(idx) {
 
 // Returns the state
 TicTacToe.prototype.makeState = function() {
+    if (DBG) console.log("making state...");
     return {s: this.board};
 };
 
