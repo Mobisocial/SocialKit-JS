@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/> 
+        <script type="text/javascript" src="../../lib/socialKit.js"></script>
+        <script type="text/javascript" src="../../jquery-1.5.2.min.js"></script>
+        <!--<script type="text/javascript" src="todataurl.js"></script>-->
+        <script type="text/javascript" src="app.js"></script>
+        
+        <style type="text/css">
+            body {
+                font-family: Helvetica;
+                font-size: 0.9em;
+                text-align: center;
+                background-color: #ccc;
+                height: 100%;
+            }
+            
+            input,button {
+                line-height: 1.5em;
+                font-size: 1.8em;
+            }
+            
+            #sketchpad {
+	       border:1px solid black;
+               background-color: #eee;
+               z-index:10;
+            }
+            #topbar {
+              position:absolute;
+              text-align:right;
+              width:100%;
+            }
+            #topbar button {
+              margin-right: 18px;
+              z-index:100;
+            }
+        </style>
+        
+        <title>MusuSketch!</title>
+    </head>
+    <body>
+     <div id="topbar">
+       <button id="post">Post</button>
+     </div>
+     <canvas id="sketchpad">
+     </canvas>
+    </body>
+</html>
