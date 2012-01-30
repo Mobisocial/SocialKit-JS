@@ -11,9 +11,9 @@ Musubi.ready(function(context) {
     musu = new MusuWriter(context);
 
     $("#post").click(function(e) {
-      var style = "font-size:30px;";
-      style += " background-color:" + $("#textbox").css("background-color") + ";";
-      style += " color:" + $("#textbox").css("color") + ";";
+      var style = "font-size:30px;padding:5px;";
+      style += "background-color:" + $("#textbox").css("background-color") + ";";
+      style += "color:" + $("#textbox").css("color") + ";";
 
       var html = '<span style="' + style + '">' + $("#textbox").val() + '!!</span>';
       var content = { "__html" : html };

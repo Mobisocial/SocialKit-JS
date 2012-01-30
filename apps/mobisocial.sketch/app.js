@@ -9,11 +9,11 @@ Musubi.ready(function(appContext) {
 
     var sketch = new CanvasDrawr({id:"sketchpad", size: 5, color: 'black' }); 
     $("#post").click(function(e) {
-      var imgUrl = document.getElementById('sketchpad').toDataURL("image/png");
+      var imgUrl = document.getElementById('sketchpad').toDataURL();
       var html = '<img src="'+ imgUrl +'" height="250px"/>';
       var content = { "__html" : html };
       var obj = new SocialKit.Obj({type : "sketchpad", data: content});
-      appContext.feed.post(obj);
+      if (!testingInBrowser) appContext.feed.post(obj);
       $("body").html(html);
     });
 });
@@ -25,6 +25,7 @@ Musubi.ready(function(appContext) {
            
 var CanvasDrawr = function(options) {
   // grab canvas element
+  var drawing = false;
   var canvas = document.getElementById(options.id),
   ctxt = canvas.getContext("2d");
 
@@ -42,6 +43,9 @@ var CanvasDrawr = function(options) {
   ctxt.pX = undefined;
   ctxt.pY = undefined;
 
+  ctxt.fillStyle = "white";
+  ctxt.fillRect(0,0,canvas.width,canvas.height);
+
   var lines = [,,];
   var offset = $(canvas).offset();
                
@@ -51,29 +55,56 @@ var CanvasDrawr = function(options) {
       //set pX and pY from first click
       canvas.addEventListener('touchstart', self.preDraw, false);
       canvas.addEventListener('touchmove', self.draw, false);
-    },
 
+//      canvas.addEventListener('mousedown', self.preDraw, false);
+//      canvas.addEventListener('mouseup', self.postDraw, false);
+//      canvas.addEventListener('mousemove', self.draw, false);
+    },
+    postDraw: function(event) {
+      drawing = false;
+    },
     preDraw: function(event) {
-      $.each(event.touches, function(i, touch) {
-        var id = touch.identifier;
-        lines[id] = { x : this.pageX - offset.left, 
-                      y : this.pageY - offset.top, 
-                      color : options.color
-                     };
-      });
+      if (event.type == "mousedown") {
+        drawing = true;
+        lines[0] = { x : this.pageX - offset.left,
+                     y : this.pageY - offset.top,
+                     color : options.color
+                   };
+      } else {
+        $.each(event.touches, function(i, touch) {
+          var id = touch.identifier;
+          lines[id] = { x : this.pageX - offset.left, 
+                        y : this.pageY - offset.top, 
+                        color : options.color
+                       };
+        });
+      }
       event.preventDefault();
     },
 
     draw: function(event) {
-      var e = event, hmm = {};
-      $.each(event.touches, function(i, touch) {
-        var id = touch.identifier,
-            moveX = this.pageX - offset.left - lines[id].x,
-            moveY = this.pageY - offset.top - lines[id].y;
-        var ret = self.move(id, moveX, moveY);
-        lines[id].x = ret.x;
-        lines[id].y = ret.y;
-      });
+      if (event.type == "mousemove") {
+        if (!drawing) {
+          return;
+        }
+
+        var id = 0;
+        moveX = this.pageX - offset.left - event.x;
+        moveY = this.pageY - offset.top - event.y;
+        var ret = self.move(0, moveX, moveY);
+        lines[0].x = ret.x;
+        lines[0].y = ret.y;
+      } else {
+        var e = event, hmm = {};
+        $.each(event.touches, function(i, touch) {
+          var id = touch.identifier,
+              moveX = this.pageX - offset.left - lines[id].x,
+              moveY = this.pageY - offset.top - lines[id].y;
+          var ret = self.move(id, moveX, moveY);
+          lines[id].x = ret.x;
+          lines[id].y = ret.y;
+        });
+      }
       event.preventDefault();
     },
 
