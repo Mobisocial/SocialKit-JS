@@ -19,7 +19,7 @@ Musubi.ready(function(context) {
       var content = { "__html" : html };
       var obj = new SocialKit.Obj({type : "note", data: content})
       musu.appContext.feed.post(obj);
-      $("body").html(html);
+      musu.appContext.quit();
     });
 });
 

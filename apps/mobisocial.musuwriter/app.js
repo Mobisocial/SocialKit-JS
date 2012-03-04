@@ -14,5 +14,6 @@ Musubi.ready(function(context) {
       var content = { "__html" : $("#textbox").val() };
       var obj = new SocialKit.Obj({type : "note", data: content})
       musu.appContext.feed.post(obj);
+      musu.appContext.quit();
     });
 });

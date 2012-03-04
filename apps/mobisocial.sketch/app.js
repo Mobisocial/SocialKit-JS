@@ -13,8 +13,10 @@ Musubi.ready(function(appContext) {
       var html = '<img src="'+ imgUrl +'" height="250px"/>';
       var content = { "__html" : html };
       var obj = new SocialKit.Obj({type : "sketchpad", data: content});
-      if (!testingInBrowser) appContext.feed.post(obj);
-      $("body").html(html);
+      if (!testingInBrowser) {
+        appContext.feed.post(obj);
+        appContext.quit();
+      }
     });
 });
 
