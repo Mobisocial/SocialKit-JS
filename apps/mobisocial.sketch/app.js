@@ -7,16 +7,20 @@ var testingInBrowser = false;
 Musubi.ready(function(appContext) {
     console.log("launching sketchpad");
 
-    var sketch = new CanvasDrawr({id:"sketchpad", size: 5, color: 'black' }); 
+    var sketch = new CanvasDrawr({id:"sketchpad", size: 5, color: $("#color").css("background-color") }); 
     $("#post").click(function(e) {
       var imgUrl = document.getElementById('sketchpad').toDataURL();
-      var html = '<img src="'+ imgUrl +'" height="250px"/>';
+      var html = '<img src="'+ imgUrl +'" height="200px"/>';
       var content = { "__html" : html };
       var obj = new SocialKit.Obj({type : "sketchpad", data: content});
       if (!testingInBrowser) {
         appContext.feed.post(obj);
         appContext.quit();
       }
+    });
+
+    $("#color").click(function(e) {
+      showColorPicker();
     });
 });
 
@@ -57,10 +61,6 @@ var CanvasDrawr = function(options) {
       //set pX and pY from first click
       canvas.addEventListener('touchstart', self.preDraw, false);
       canvas.addEventListener('touchmove', self.draw, false);
-
-//      canvas.addEventListener('mousedown', self.preDraw, false);
-//      canvas.addEventListener('mouseup', self.postDraw, false);
-//      canvas.addEventListener('mousemove', self.draw, false);
     },
     postDraw: function(event) {
       drawing = false;
@@ -70,14 +70,14 @@ var CanvasDrawr = function(options) {
         drawing = true;
         lines[0] = { x : this.pageX - offset.left,
                      y : this.pageY - offset.top,
-                     color : options.color
+                     color : $("#color").css("background-color")
                    };
       } else {
         $.each(event.touches, function(i, touch) {
           var id = touch.identifier;
           lines[id] = { x : this.pageX - offset.left, 
                         y : this.pageY - offset.top, 
-                        color : options.color
+                        color : $("#color").css("background-color")
                        };
         });
       }
