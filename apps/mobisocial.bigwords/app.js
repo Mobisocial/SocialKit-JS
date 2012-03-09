@@ -15,7 +15,7 @@ Musubi.ready(function(context) {
       style += "background-color:" + $("#textbox").css("background-color") + ";";
       style += "color:" + $("#textbox").css("color") + ";";
 
-      var html = '<span style="' + style + '">' + $("#textbox").val() + '!!</span>';
+      var html = '<span style="' + style + '">' + $("#textbox").val() + '</span>';
       var content = { "__html" : html };
       var obj = new SocialKit.Obj({type : "note", data: content})
       musu.appContext.feed.post(obj);
