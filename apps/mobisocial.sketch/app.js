@@ -1,27 +1,37 @@
 /**
  * Musu Sketch
  */
-
+console.log("INCLUDED");
 var testingInBrowser = false;
 
 Musubi.ready(function(appContext) {
-    console.log("launching sketchpad");
+  console.log("launching sketchpad...");
+  console.log("2243");
+  var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
+  if (appContext.message != null && appContext.message.obj != null) {
+    var html = appContext.message.obj.data.__html;
+    var src = $(html).attr("src");
+    if (src) {
+      args.bg = $(html)[0];
+    }
+  }
 
-    var sketch = new CanvasDrawr({id:"sketchpad", size: 5, color: $("#color").css("background-color") }); 
-    $("#post").click(function(e) {
-      var imgUrl = document.getElementById('sketchpad').toDataURL();
-      var html = '<img src="'+ imgUrl +'" height="200px"/>';
-      var content = { "__html" : html };
-      var obj = new SocialKit.Obj({type : "sketchpad", data: content});
-      if (!testingInBrowser) {
-        appContext.feed.post(obj);
-        appContext.quit();
-      }
-    });
+  var sketch = new CanvasDrawr(args); 
 
-    $("#color").click(function(e) {
-      showColorPicker();
-    });
+  $("#post").click(function(e) {
+    var imgUrl = document.getElementById('sketchpad').toDataURL();
+    var html = '<img src="'+ imgUrl +'" height="200px"/>';
+    var content = { "__html" : html };
+    var obj = new SocialKit.Obj({type : "sketchpad", data: content});
+    if (!testingInBrowser) {
+      appContext.feed.post(obj);
+      appContext.quit();
+    }
+  });
+
+  $("#color").click(function(e) {
+    showColorPicker();
+  });
 });
 
 // canvasDrawr originally from Mike Taylr  http://miketaylr.com/
@@ -49,9 +59,12 @@ var CanvasDrawr = function(options) {
   ctxt.pX = undefined;
   ctxt.pY = undefined;
 
-  ctxt.fillStyle = "white";
-  ctxt.fillRect(0,0,canvas.width,canvas.height);
-
+  if (options.bg) {
+    ctxt.drawImage(options.bg, 0, 0);
+  } else {
+    ctxt.fillStyle = "white";
+    ctxt.fillRect(0,0,canvas.width,canvas.height);
+  }
   var lines = [,,];
   var offset = $(canvas).offset();
                
