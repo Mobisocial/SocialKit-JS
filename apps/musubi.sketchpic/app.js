@@ -26,8 +26,9 @@ Musubi.ready(function(appContext) {
 
   $("#post").click(function(e) {
     var imgUrl = document.getElementById('sketchpad').toDataURL();
-    var html = '<img src="'+ imgUrl +'" height="200px"/>';
-    var obj = new SocialKit.Obj({type : "sketchpad", raw__b64_data_url: imgUrl });
+    //var html = '<img src="'+ imgUrl +'" height="200px"/>';
+    var json = { "mimeType" : "image/jpg" };
+    var obj = new SocialKit.Obj({"type" : "picture", "raw_data_url": imgUrl, "json": json });
     if (!testingInBrowser) {
       appContext.feed.post(obj);
       appContext.quit();
