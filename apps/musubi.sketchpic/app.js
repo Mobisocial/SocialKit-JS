@@ -1,25 +1,19 @@
 /**
  * Musu Sketch
  */
-console.log("INCLUDED");
 var testingInBrowser = false;
 
 Musubi.ready(function(appContext) {
-  console.log("launching sketchpad...");
-  console.log("2243");
+  console.log("launching sketchpic... 14");
   var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
-  if (appContext.message != null && appContext.message.obj != null) {
-    /**
-     *  TODO: get pictureObj data into a canvas.
-     *
-     *
-    var html = appContext.message.obj.data.__html;
-    var src = $(html).attr("src");
-    if (src) {
-      args.bg = $(html)[0];
+  if (appContext.obj != null) {
+    console.log("have obj " + appContext.obj);
+    console.log("have ID# " + appContext.obj.objId);
+    var img = Musubi.urlForRawData(appContext.obj.objId);
+    console.log("have raw " + img);
+    if (img != null) {
+      args.bg = img;
     }
-    *
-    **/
   }
 
   var sketch = new CanvasDrawr(args); 
@@ -66,6 +60,7 @@ var CanvasDrawr = function(options) {
   ctxt.pY = undefined;
 
   if (options.bg) {
+    console.log("drawing bg " + options.bg);
     ctxt.drawImage(options.bg, 0, 0);
   } else {
     ctxt.fillStyle = "white";
