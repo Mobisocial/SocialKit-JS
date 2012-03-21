@@ -232,7 +232,6 @@ SocialKit.SignedMessage.prototype = new SocialKit.Message;
 SocialKit.SignedMessage.prototype.init = function(json) {
     SocialKit.Message.prototype.init.call(this, json);
     this.hash = json.hash;
-    this.objId = json.objId;
 };
 
 //document.dispatchEvent(document.createEvent('socialKitReady'));
