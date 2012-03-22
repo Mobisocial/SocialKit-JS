@@ -10,7 +10,6 @@ var Mx = 0;
 var My = 0;
 
 Musubi.ready(function(appContext) {
-  console.log("launching sketchpic... 17");
   var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
   if (appContext.obj != null) {
     var img = Musubi.urlForRawData(appContext.obj.objId);
@@ -50,7 +49,7 @@ Musubi.ready(function(appContext) {
 
   window.addEventListener(orientationEvent, function() {
     // window.orientation, screen.width
-    console.log(sketch.offset + " she be" );
+    orientationUpdate();
   }, false);
 
 
@@ -59,10 +58,10 @@ Musubi.ready(function(appContext) {
   });
 });
 
-// CanvasDrawr originally from Mike Taylr  http://miketaylr.com/
-// Tim Branyen massaged it: http://timbranyen.com/
-// and i did too. with multi touch.
-// and boris fixed some touch identifier stuff to be more specific.
+
+function orientationUpdate() {
+
+}
 
 function onImageLoaded(img) {
   console.log("onImageLoaded(" + img);
@@ -88,6 +87,11 @@ function onImageLoaded(img) {
   ctxt.drawImage(img, sx, sy, scaleWidth, scaleHeight);  
   console.log("drawing img " + scaleWidth + "x" + scaleHeight);
 }
+
+// CanvasDrawr originally from Mike Taylr  http://miketaylr.com/
+// Tim Branyen massaged it: http://timbranyen.com/
+// and i did too. with multi touch.
+// and boris fixed some touch identifier stuff to be more specific.
            
 var SketchApp = function(options) {
   // grab canvas element
@@ -165,21 +169,17 @@ var SketchApp = function(options) {
         moveX = this.pageX - offset.left - event.x;
         moveY = this.pageY - offset.top - event.y;
         var ret = self.move(0, moveX, moveY);
-        Mx = Math.max(Mx, ret.x);
-        My = Math.max(My, ret.y);
+        updateBounds(ctxt, ret);
         lines[0].x = ret.x;
         lines[0].y = ret.y;
       } else {
-        var e = event, hmm = {};
+        var e = event;
         $.each(event.touches, function(i, touch) {
           var id = touch.identifier,
               moveX = this.pageX - offset.left - lines[id].x,
               moveY = this.pageY - offset.top - lines[id].y;
           var ret = self.move(id, moveX, moveY);
-          Mx = Math.max(Mx, ret.x + ctxt.lineWidth);
-          My = Math.max(My, ret.y + ctxt.lineWidth);
-          mx = Math.min(mx, ret.x - ctxt.lineWidth);
-          my = Math.min(my, ret.y - ctxt.lineWidth);
+          updateBounds(ctxt, ret);
           lines[id].x = ret.x;
           lines[id].y = ret.y;
         });
@@ -203,6 +203,13 @@ var SketchApp = function(options) {
   };
   return self.init();
 };
+
+function updateBounds(ctxt, ret) {
+  Mx = Math.max(Mx, ret.x + ctxt.lineWidth);
+  My = Math.max(My, ret.y + ctxt.lineWidth);
+  mx = Math.min(mx, ret.x - ctxt.lineWidth);
+  my = Math.min(my, ret.y - ctxt.lineWidth);
+}
 
 $(function(){
   if (testingInBrowser) {
