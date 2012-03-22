@@ -3,6 +3,12 @@
  */
 var testingInBrowser = false;
 
+var sketch; // Global context for SketchApp.
+var mx = 0; // TODO: someone with "javascript skills" should make this object oriented.
+var my = 0;
+var Mx = 0;
+var My = 0;
+
 Musubi.ready(function(appContext) {
   console.log("launching sketchpic... 17");
   var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
@@ -13,28 +19,44 @@ Musubi.ready(function(appContext) {
     }
   }
 
-  var sketch = new CanvasDrawr(args); 
+  sketch = new SketchApp(args); 
 
   $("#post").click(function(e) {
     var elm = document.getElementById('sketchpad');
-    console.log("elm " + elm);
-    var imgUrl = elm.toDataURL();
-    console.log("got url");
-    //var html = '<img src="'+ imgUrl +'" height="200px"/>';
+    var copy = document.createElement("canvas");
+    var w = Mx - mx;
+    var h = My - my;
+    copy.width = w + 20;
+    copy.height = h + 20;
+    copy.getContext("2d").drawImage(elm, mx, my, w, h, 10, 10, w, h);
+    var snapshot = copy.toDataURL();
+
     var json = { "mimeType" : "image/jpeg" };
-    var obj = new SocialKit.Obj({"type" : "picture", "raw_data_url": imgUrl, "json": json });
+    var obj = new SocialKit.Obj({"type" : "picture", "raw_data_url": snapshot, "json": json });
     if (!testingInBrowser) {
       appContext.feed.post(obj);
       appContext.quit();
     }
   });
 
+  /**
+   * Adjust touch event bindings if the screen rotates
+   */
+  var supportsOrientationChange = "onorientationchange" in window,
+      orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+
+  window.addEventListener(orientationEvent, function() {
+    // window.orientation, screen.width
+    console.log(sketch.offset + " she be" );
+  }, false);
+
+
   $("#color").click(function(e) {
     showColorPicker();
   });
 });
 
-// canvasDrawr originally from Mike Taylr  http://miketaylr.com/
+// CanvasDrawr originally from Mike Taylr  http://miketaylr.com/
 // Tim Branyen massaged it: http://timbranyen.com/
 // and i did too. with multi touch.
 // and boris fixed some touch identifier stuff to be more specific.
@@ -56,7 +78,7 @@ function onImageLoaded(img) {
   console.log("drawing img " + scaleWidth + "x" + scaleHeight);
 }
            
-var CanvasDrawr = function(options) {
+var SketchApp = function(options) {
   // grab canvas element
   var drawing = false;
   var canvas = document.getElementById(options.id),
@@ -69,6 +91,11 @@ var CanvasDrawr = function(options) {
   canvas.style.height = $(document).height();
   canvas.height = canvas.offsetHeight;
   canvas.style.height = '';
+
+  Mx = 0;
+  My = 0;
+  mx = canvas.width;
+  my = canvas.height;
 
   // set props from options, but the defaults are for the cool kids
   ctxt.lineWidth = options.size || Math.ceil(Math.random() * 35);
@@ -92,6 +119,8 @@ var CanvasDrawr = function(options) {
       //set pX and pY from first click
       canvas.addEventListener('touchstart', self.preDraw, false);
       canvas.addEventListener('touchmove', self.draw, false);
+
+      return this;
     },
     postDraw: function(event) {
       drawing = false;
@@ -125,6 +154,8 @@ var CanvasDrawr = function(options) {
         moveX = this.pageX - offset.left - event.x;
         moveY = this.pageY - offset.top - event.y;
         var ret = self.move(0, moveX, moveY);
+        Mx = Math.max(Mx, ret.x);
+        My = Math.max(My, ret.y);
         lines[0].x = ret.x;
         lines[0].y = ret.y;
       } else {
@@ -134,6 +165,10 @@ var CanvasDrawr = function(options) {
               moveX = this.pageX - offset.left - lines[id].x,
               moveY = this.pageY - offset.top - lines[id].y;
           var ret = self.move(id, moveX, moveY);
+          Mx = Math.max(Mx, ret.x + ctxt.lineWidth);
+          My = Math.max(My, ret.y + ctxt.lineWidth);
+          mx = Math.min(mx, ret.x - ctxt.lineWidth);
+          my = Math.min(my, ret.y - ctxt.lineWidth);
           lines[id].x = ret.x;
           lines[id].y = ret.y;
         });
@@ -153,7 +188,7 @@ var CanvasDrawr = function(options) {
       ctxt.closePath();
 
       return { x: newX, y: newY};
-    }
+    },
   };
   return self.init();
 };
