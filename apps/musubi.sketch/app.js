@@ -28,7 +28,10 @@ Musubi.ready(function(appContext) {
     var h = My - my;
     copy.width = w + 20;
     copy.height = h + 20;
-    copy.getContext("2d").drawImage(elm, mx, my, w, h, 10, 10, w, h);
+    var cpx = copy.getContext("2d");
+    cpx.fillStyle = "white";
+    cpx.fillRect(0,0,copy.width, copy.height);
+    cpx.drawImage(elm, mx, my, w, h, 10, 10, w, h);
     var snapshot = copy.toDataURL();
 
     var json = { "mimeType" : "image/jpeg" };
@@ -74,7 +77,15 @@ function onImageLoaded(img) {
     scaleHeight = canvas.height;
     scaleWidth = scaleHeight * aspect;
   }
-  ctxt.drawImage(img, 0, (canvas.height - scaleHeight) / 2, scaleWidth, scaleHeight);  
+  var sy = (canvas.height - scaleHeight) / 2;
+  var sx = 0;
+
+  mx = sx;
+  my = sy;
+  Mx = scaleWidth + mx; 
+  My = scaleHeight + my;
+
+  ctxt.drawImage(img, sx, sy, scaleWidth, scaleHeight);  
   console.log("drawing img " + scaleWidth + "x" + scaleHeight);
 }
            
