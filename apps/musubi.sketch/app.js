@@ -4,13 +4,13 @@
 var testingInBrowser = false;
 
 Musubi.ready(function(appContext) {
-  console.log("launching sketchpic... 14");
+  console.log("launching sketchpic... 17");
   var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
   if (appContext.obj != null) {
     console.log("have obj " + appContext.obj);
-    console.log("have ID# " + appContext.obj.objId);
     var img = Musubi.urlForRawData(appContext.obj.objId);
     console.log("have raw " + img);
+
     if (img != null) {
       args.bg = img;
     }
@@ -19,10 +19,15 @@ Musubi.ready(function(appContext) {
   var sketch = new CanvasDrawr(args); 
 
   $("#post").click(function(e) {
-    var imgUrl = document.getElementById('sketchpad').toDataURL();
+    console.log("posting...");
+    var elm = document.getElementById('sketchpad');
+    console.log("elm " + elm);
+    var imgUrl = elm.toDataURL();
+    console.log("got url");
     //var html = '<img src="'+ imgUrl +'" height="200px"/>';
     var json = { "mimeType" : "image/jpg" };
     var obj = new SocialKit.Obj({"type" : "picture", "raw_data_url": imgUrl, "json": json });
+    console.log("have obj");
     if (!testingInBrowser) {
       appContext.feed.post(obj);
       appContext.quit();
@@ -60,11 +65,24 @@ var CanvasDrawr = function(options) {
   ctxt.pY = undefined;
 
   if (options.bg) {
-    console.log("drawing bg " + options.bg);
-    ctxt.drawImage(options.bg, 0, 0);
+    console.log("fetching bg " + options.bg);
+    var img = new Image();
+    img.onload = function() {
+      var aspect = img.width / img.height;
+      var scaleWidth = canvas.width;
+      var scaleHeight = scaleWidth / aspect;
+      if (scaleHeight > canvas.height) {
+        console.log("rescaling from height " + scaleHeight);
+        scaleHeight = canvas.height;
+        scaleWidth = scaleHeight * aspect;
+      }
+      ctxt.drawImage(img, 0, (canvas.height - scaleHeight) / 2, scaleWidth, scaleHeight);  
+      console.log("drawing img " + scaleWidth + "x" + scaleHeight);
+    }
+    img.src = options.bg;
   } else {
     ctxt.fillStyle = "white";
-    ctxt.fillRect(0,0,canvas.width,canvas.height);
+    ctxt.fillRect(0,0,canvas.width, canvas.height);
   }
   var lines = [,,];
   var offset = $(canvas).offset();
