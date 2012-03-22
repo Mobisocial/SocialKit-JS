@@ -7,10 +7,7 @@ Musubi.ready(function(appContext) {
   console.log("launching sketchpic... 17");
   var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
   if (appContext.obj != null) {
-    console.log("have obj " + appContext.obj);
     var img = Musubi.urlForRawData(appContext.obj.objId);
-    console.log("have raw " + img);
-
     if (img != null) {
       args.bg = img;
     }
@@ -24,7 +21,7 @@ Musubi.ready(function(appContext) {
     var imgUrl = elm.toDataURL();
     console.log("got url");
     //var html = '<img src="'+ imgUrl +'" height="200px"/>';
-    var json = { "mimeType" : "image/jpg" };
+    var json = { "mimeType" : "image/jpeg" };
     var obj = new SocialKit.Obj({"type" : "picture", "raw_data_url": imgUrl, "json": json });
     if (!testingInBrowser) {
       appContext.feed.post(obj);
@@ -41,6 +38,23 @@ Musubi.ready(function(appContext) {
 // Tim Branyen massaged it: http://timbranyen.com/
 // and i did too. with multi touch.
 // and boris fixed some touch identifier stuff to be more specific.
+
+function onImageLoaded(img) {
+  console.log("onImageLoaded(" + img);
+  var canvas = document.getElementById("sketchpad"),
+  ctxt = canvas.getContext("2d");
+
+  var aspect = img.width / img.height;
+  var scaleWidth = canvas.width;
+  var scaleHeight = scaleWidth / aspect;
+  if (scaleHeight > canvas.height) {
+    console.log("rescaling from height " + scaleHeight);
+    scaleHeight = canvas.height;
+    scaleWidth = scaleHeight * aspect;
+  }
+  ctxt.drawImage(img, 0, (canvas.height - scaleHeight) / 2, scaleWidth, scaleHeight);  
+  console.log("drawing img " + scaleWidth + "x" + scaleHeight);
+}
            
 var CanvasDrawr = function(options) {
   // grab canvas element
@@ -62,26 +76,13 @@ var CanvasDrawr = function(options) {
   ctxt.pX = undefined;
   ctxt.pY = undefined;
 
+  ctxt.fillStyle = "white";
+  ctxt.fillRect(0,0,canvas.width, canvas.height);
+
   if (options.bg) {
-    console.log("fetching bg " + options.bg);
-    var img = new Image();
-    img.onload = function() {
-      var aspect = img.width / img.height;
-      var scaleWidth = canvas.width;
-      var scaleHeight = scaleWidth / aspect;
-      if (scaleHeight > canvas.height) {
-        console.log("rescaling from height " + scaleHeight);
-        scaleHeight = canvas.height;
-        scaleWidth = scaleHeight * aspect;
-      }
-      ctxt.drawImage(img, 0, (canvas.height - scaleHeight) / 2, scaleWidth, scaleHeight);  
-      console.log("drawing img " + scaleWidth + "x" + scaleHeight);
-    }
-    img.src = options.bg;
-  } else {
-    ctxt.fillStyle = "white";
-    ctxt.fillRect(0,0,canvas.width, canvas.height);
+    $("body").append("<img src='"+options.bg+"' onload='onImageLoaded(this)' style='display:none;' />");
   }
+
   var lines = [,,];
   var offset = $(canvas).offset();
                
