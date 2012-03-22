@@ -8,8 +8,10 @@ var mx = 0; // TODO: someone with "javascript skills" should make this object or
 var my = 0;
 var Mx = 0;
 var My = 0;
+var canvas = null;
 
 Musubi.ready(function(appContext) {
+  canvas = document.getElementById("sketchpad");
   var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
   if (appContext.obj != null) {
     var img = Musubi.urlForRawData(appContext.obj.objId);
@@ -206,9 +208,13 @@ var SketchApp = function(options) {
 
 function updateBounds(ctxt, ret) {
   Mx = Math.max(Mx, ret.x + ctxt.lineWidth);
+  Mx = Math.min(Mx, canvas.width);  
   My = Math.max(My, ret.y + ctxt.lineWidth);
+  My = Math.min(My, canvas.height);  
   mx = Math.min(mx, ret.x - ctxt.lineWidth);
+  mx = Math.max(mx, 0);  
   my = Math.min(my, ret.y - ctxt.lineWidth);
+  my = Math.max(my, 0);  
 }
 
 $(function(){
