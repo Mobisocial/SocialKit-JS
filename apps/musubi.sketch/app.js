@@ -143,6 +143,7 @@ var SketchApp = function(options) {
       drawing = false;
     },
     preDraw: function(event) {
+      offset = $(canvas).offset();
       if (event.type == "mousedown") {
         drawing = true;
         lines[0] = { x : this.pageX - offset.left,
