@@ -19,7 +19,6 @@ Musubi.ready(function(appContext) {
   var sketch = new CanvasDrawr(args); 
 
   $("#post").click(function(e) {
-    console.log("posting...");
     var elm = document.getElementById('sketchpad');
     console.log("elm " + elm);
     var imgUrl = elm.toDataURL();
@@ -27,7 +26,6 @@ Musubi.ready(function(appContext) {
     //var html = '<img src="'+ imgUrl +'" height="200px"/>';
     var json = { "mimeType" : "image/jpg" };
     var obj = new SocialKit.Obj({"type" : "picture", "raw_data_url": imgUrl, "json": json });
-    console.log("have obj");
     if (!testingInBrowser) {
       appContext.feed.post(obj);
       appContext.quit();

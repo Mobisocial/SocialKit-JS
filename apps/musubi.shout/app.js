@@ -26,7 +26,6 @@ Musubi.ready(function(context) {
       var html = '<span style="' + style + '">' + text + '</span>';
       var content = { "__html" : html, "text" : text };
       var obj = new SocialKit.Obj({type : "note", json: content})
-      console.log("posting note " + content);
       musu.appContext.feed.post(obj);
       musu.appContext.quit();
     });
