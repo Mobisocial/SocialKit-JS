@@ -10,7 +10,12 @@ var Mx = 0;
 var My = 0;
 var canvas = null;
 
+var globalAppContext;
+
 Musubi.ready(function(appContext) {
+
+  globalAppContext = appContext;
+
   canvas = document.getElementById("sketchpad");
   var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
   if (appContext.obj != null) {
@@ -58,6 +63,14 @@ Musubi.ready(function(appContext) {
   $("#color").click(function(e) {
     showColorPicker();
   });
+
+
+  globalAppContext.setBack(function() {
+    if (confirm ("Did you want to post this picture?")) {
+      $("#post").trigger("click");
+    }
+  });
+  
 });
 
 

@@ -88,10 +88,6 @@ document.getElementById("divpreviewtxt").innerHTML=hex;
 document.body.style.cursor="pointer";
 }
 
-function mouseOutMap() {
-
-}
-
 function pickColor() {
   $("#colorpicker").css("display","none");
   var color = document.getElementById("divpreview").style.backgroundColor;

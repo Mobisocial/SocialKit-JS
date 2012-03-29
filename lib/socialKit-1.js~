@@ -181,7 +181,7 @@ SocialKit.Feed.prototype.onNewMessage = function(callback) {
 
 SocialKit.Feed.prototype._newMessage = function(json) {
     if (this._messageListener != null) {
-        var msg = false; // new SocialKit.SignedMessage(json);
+        var msg = new SocialKit.SignedMessage(json);
         this._messageListener(msg);
     }
 };
@@ -249,6 +249,22 @@ SocialKit.DbObj.prototype.toString = function() {
     return "<DbObj: " + this.objId + "," + this.sender.toString() + "," + this.appId + "," + this.feedName + "," + ((this.data != null) ? JSON.stringify(this.data) : null) + ">";
 };
 
+/*
+ * SignedMessage class TODO: Deprecated?
+ */
+
+SocialKit.SignedMessage = function(json) {
+    if (DBG) console.log("SignedMessage(" + JSON.stringify(json));
+    this.hash = null;
+    if (json)
+        this.init(json);
+};
+SocialKit.SignedMessage.prototype = new SocialKit.Message;
+
+SocialKit.SignedMessage.prototype.init = function(json) {
+    SocialKit.Message.prototype.init.call(this, json);
+    this.hash = json.hash;
+};
 
 //document.dispatchEvent(document.createEvent('socialKitReady'));
 //$.event.trigger({type: 'socialKitReady'});
