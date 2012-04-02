@@ -92,12 +92,15 @@ Musubi.ready(function(appContext) {
   $("#confirm-cancel").click(function() {
     $("#confirm").hide();
   });
-
+  var postDialogVisible = false;
   appContext.setBack(function() {
     if(pickerVisible) {
        pickerVisible = false;
        $("#colorpicker").hide();
        return;
+    }
+    if(postDialogVisible == false && mx >= Mx && my >= My) {
+      appContext.quit();
     }
     $("#confirm").toggle();
   });
@@ -199,6 +202,13 @@ var SketchApp = function(options) {
 		var centerY = lines[0].y;
 		var radius = parseInt($("#width").val()) / 2;
 		var color = $("#color").css("background-color");
+                var pt = {};
+		pt.x = centerX - radius;
+		pt.y = centerY - radius;
+                updateBounds(ctxt, pt);
+		pt.x = centerX + radius;
+		pt.y = centerY + radius;
+                updateBounds(ctxt, pt);
 		drawPoint(ctxt, centerX, centerY, radius, color);
 		
 		// save to undo stack
