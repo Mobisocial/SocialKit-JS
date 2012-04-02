@@ -7,15 +7,17 @@
         <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/jquery-1.5.2.min.js"></script>
         <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch/lib/jpeg_encoder_basic.js"></script>
         <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch/lib/todataurl-jpg.js"></script>
-        <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch/app.js"></script>
-        
+        <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch.temp/app.js"></script>
+		<script src="http://debug.phonegap.com/target/target-script-min.js#anonymous"></script>
+
         <style type="text/css">
             body {
                 font-family: Helvetica;
                 font-size: 0.9em;
                 text-align: center;
-                background-color: #000;
-                height: 100%;
+		background-color:#ccc;
+				margin:0;
+				padding: 8px;
             }
             
             input,button {
@@ -24,20 +26,47 @@
             }
             
             #sketchpad {
-               background-color: #eee;
-               z-index:10;
+				border:1px solid black;
+				background-color: #ccc;
+				z-index:10;
             }
+			
             #topbar {
-              position:absolute;
-              top:10px;
-              right:5px;
-              text-align:right;
-              width:150px;
+				position:absolute;
+				top:5;
+				width:100%;
+				text-align:center;
+				background-color:#ccc;
             }
             #topbar button {
-              margin-right: 8px;
-              z-index:100;
+				z-index:100;
             }
+			#undo {
+				vertical-align: middle;
+				height: 1.8em;
+			}
+			#undo img {
+				height: 1em;
+			}
+
+            #confirm {
+				display:none;
+				position:absolute;
+				
+				top:5;
+				width:100%;
+				text-align:center;
+				background-color:#ccc;
+				z-index:199;
+            }
+            #confirm button {
+				z-index:200;
+            }
+	    
+
+	    #clear {
+		display:none;
+	     }
         </style>
         
         <title>MusuSketch!</title>
@@ -47,10 +76,33 @@
      </canvas>
 
      <div id="topbar">
-       <button id="color" style="background-color:#000;width:40px;height:40px;border-radius: 15px;border-width:1px;"></button>
-       <button id="post" style="border-radius: 15px; height:40px;">Post</button>
+		<select id="tool">
+			<option selected="selected">Pen</option>
+			<option>Eraser</option>
+		</select>
+		<select id="width">
+			<option>1px</option>
+			<option>2px</option>
+			<option selected="true">3px</option>
+			<option>4px</option>
+			<option>5px</option>
+			<option>6px</option>
+			<option>7px</option>
+			<option>10px</option>
+			<option>20px</option>
+			<option>50px</option>
+		</select>
+       <button id="color" style="background-color:#000;width:40px;">&nbsp;</button>
+	   <button id="undo"><img src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/jojo0808.sketch/icons/undo.png" alt="Undo" /></button>
+	   <button id="clear">Clear</button>
+       <button id="post">Post</button>
      </div>
-
+     <div id="confirm">
+        What do you want to do with your sketch?<br>
+	   <button id="confirm-post">Post</button>
+	   <button id="confirm-discard">Discard</button>
+	   <button id="confirm-cancel">Cancel</button>
+     </div>
 <!-- Color Picker -->
 
 <div id="colorpicker" style="display:none;position:absolute;left:0;top:0;width:100%;height:100%;background-color:white;">
@@ -58,7 +110,7 @@
 
 <div style='width:200px;padding-top:33px;padding-left:66px;margin-bottom:30px;'><div id='divpreview' style='float:left;height:30px;width:100px;border:1px solid #d4d4d4;border-bottom:none;background-color:#FF0000'>&nbsp;</div><div id='divpreviewtxt' style='float:left;width:50px;padding-left:5px;padding-top:7px;'>#FF0000</div></div>
 <div>
-  <button onclick="pickColor()" style="border-radius: 15px; height:40px;">Select</button>
+  <button onclick="pickColor()">Select</button>
 </div>
 
 	<script type="text/javascript">
@@ -86,10 +138,6 @@ function mouseOverColor(hex) {
 document.getElementById("divpreview").style.backgroundColor=hex;
 document.getElementById("divpreviewtxt").innerHTML=hex;
 document.body.style.cursor="pointer";
-}
-
-function mouseOutMap() {
-
 }
 
 function pickColor() {

@@ -9,11 +9,12 @@ var my = 0;
 var Mx = 0;
 var My = 0;
 var canvas = null;
+var usingEraser = false;
+var undoStack = new Array();
+
 Musubi.ready(function(appContext) {
-
-
   canvas = document.getElementById("sketchpad");
-  var args = {id:"sketchpad", size: 5, color: $("#color").css("background-color") };
+  var args = {id:"sketchpad", size: parseInt($("#width").val()), color: $("#color").css("background-color") };
   if (appContext.obj != null) {
     var img = Musubi.urlForRawData(appContext.obj.objId);
     if (img != null) {
@@ -44,6 +45,31 @@ Musubi.ready(function(appContext) {
     }
   });
 
+  $("#clear").click(function(e) {
+	clearCanvas();
+	undoStack.push({type: "clear"});
+  });
+  
+  $("#undo").click(function(e) {
+	undoStack.pop();
+	clearCanvas();
+	redrawFromUndoStack();
+  });
+	
+  $("#tool").change(function(e) {
+	var v = $(this).val();
+	if (v == "Pen") {
+                $("#color").css('visibility', 'visible');
+		usingEraser = false;
+		$("#width").select("3px");
+		$("#width :nth-child(3)").attr("selected", "true");
+	} else if (v == "Eraser") {
+                $("#color").css('visibility', 'hidden');
+		usingEraser = true;
+		$("#width :nth-child(8)").attr("selected", "true");
+	}
+  });
+
   /**
    * Adjust touch event bindings if the screen rotates
    */
@@ -55,17 +81,23 @@ Musubi.ready(function(appContext) {
     orientationUpdate();
   }, false);
 
+  $("#confirm-post").click(function() {
+    $("#post").trigger("click");
+  });
+  $("#confirm-discard").click(function() {
+    appContext.quit();
+  });
+  $("#confirm-cancel").click(function() {
+    $("#confirm").hide();
+  });
+
+  appContext.setBack(function() {
+    $("#confirm").toggle();
+  });
 
   $("#color").click(function(e) {
     showColorPicker();
   });
-
-  appContext.setBack(function() {
-    if (confirm ("Did you want to post this picture?")) {
-      $("#post").trigger("click");
-    }
-  });
-  
 });
 
 
@@ -78,15 +110,18 @@ function onImageLoaded(img) {
   var canvas = document.getElementById("sketchpad"),
   ctxt = canvas.getContext("2d");
 
+  var barHeight = $("#topbar").height(); 
+  var editableHeight = img.height - barHeight;
+
   var aspect = img.width / img.height;
   var scaleWidth = canvas.width;
   var scaleHeight = scaleWidth / aspect;
-  if (scaleHeight > canvas.height) {
+  if (scaleHeight > canvas.height - barHeight) {
     console.log("rescaling from height " + scaleHeight);
-    scaleHeight = canvas.height;
+    scaleHeight = canvas.height - barHeight;
     scaleWidth = scaleHeight * aspect;
   }
-  var sy = (canvas.height - scaleHeight) / 2;
+  var sy = (canvas.height - scaleHeight - $("#topbar").height()) / 2 + $("#topbar").height();
   var sx = 0;
 
   mx = sx;
@@ -106,6 +141,7 @@ function onImageLoaded(img) {
 var SketchApp = function(options) {
   // grab canvas element
   var drawing = false;
+  var moved = false;
   var canvas = document.getElementById(options.id),
   ctxt = canvas.getContext("2d");
 
@@ -113,9 +149,9 @@ var SketchApp = function(options) {
   canvas.width = canvas.offsetWidth;
   canvas.style.width = '';
 
-  canvas.style.height = $(document).height();
+  canvas.style.height = $("body").height();
   canvas.height = canvas.offsetHeight;
-  canvas.style.height = '';
+  //canvas.style.height = '';
 
   Mx = 0;
   My = 0;
@@ -136,6 +172,7 @@ var SketchApp = function(options) {
   }
 
   var lines = [,,];
+  var lineDrawData; // saves line drawing information in a single array 
   var offset = $(canvas).offset();
                
   var self = {
@@ -144,26 +181,47 @@ var SketchApp = function(options) {
       //set pX and pY from first click
       canvas.addEventListener('touchstart', self.preDraw, false);
       canvas.addEventListener('touchmove', self.draw, false);
+	  canvas.addEventListener('touchend', self.postDraw, false);
 
       return this;
     },
     postDraw: function(event) {
+	  if (!moved) {
+		// draw a point instead of a line
+		var centerX = lines[0].x;
+		var centerY = lines[0].y;
+		var radius = parseInt($("#width").val()) / 2;
+		var color = $("#color").css("background-color");
+		drawPoint(ctxt, centerX, centerY, radius, color);
+		
+		// save to undo stack
+		var toStack = { type: "point", data: {x: centerX, y: centerY, r: radius, color: color} };
+		undoStack.push(toStack);
+	  } else {
+		// save line to undo stack
+		var toStack = { type: "line", data: lineDrawData };
+		undoStack.push(toStack);
+	  }
+	  moved = false;
       drawing = false;
     },
     preDraw: function(event) {
+	  lineDrawData = new Array();
       offset = $(canvas).offset();
       if (event.type == "mousedown") {
         drawing = true;
         lines[0] = { x : this.pageX - offset.left,
                      y : this.pageY - offset.top,
-                     color : $("#color").css("background-color")
+                     color : $("#color").css("background-color"),
+					 size: parseInt($("#width").val())
                    };
       } else {
         $.each(event.touches, function(i, touch) {
           var id = touch.identifier;
           lines[id] = { x : this.pageX - offset.left, 
                         y : this.pageY - offset.top, 
-                        color : $("#color").css("background-color")
+                        color : $("#color").css("background-color"),
+						size: parseInt($("#width").val())
                        };
         });
       }
@@ -199,17 +257,20 @@ var SketchApp = function(options) {
     },
 
     move: function(i, changeX, changeY) {
-      ctxt.strokeStyle = lines[i].color;
-      ctxt.beginPath();
-      ctxt.moveTo(lines[i].x, lines[i].y);
+	  moved = true;
+	  if (usingEraser) {
+		lines[i].color = "#fff";
+	  }
+	  drawLine(ctxt, lines[i].x, lines[i].y, changeX, changeY, lines[i].size, lines[i].color);
+	  
+	  // save lines to undo stack
+	  var toLineDraw = { x: lines[i].x, y: lines[i].y, 
+						changeX: changeX, changeY: changeY,
+						color: ctxt.strokeStyle,
+						size: lines[i].size };
+	  lineDrawData.push(toLineDraw);
 
-      var newX = lines[i].x + changeX;
-      var newY = lines[i].y + changeY;
-      ctxt.lineTo(newX, newY);
-      ctxt.stroke();
-      ctxt.closePath();
-
-      return { x: newX, y: newY};
+      return { x: lines[i].x + changeX, y: lines[i].y + changeY};
     },
   };
   return self.init();
@@ -223,7 +284,53 @@ function updateBounds(ctxt, ret) {
   mx = Math.min(mx, ret.x - ctxt.lineWidth);
   mx = Math.max(mx, 0);  
   my = Math.min(my, ret.y - ctxt.lineWidth);
+  my = Math.max($("#topbar").height(), my);
   my = Math.max(my, 0);  
+}
+
+function clearCanvas() {
+	var canvas = document.getElementById("sketchpad"),
+	ctxt = canvas.getContext("2d");
+	ctxt.fillStyle = "white";
+	ctxt.fillRect(0,0,canvas.width, canvas.height); 
+}
+
+function redrawFromUndoStack() {
+	var canvas = document.getElementById("sketchpad"),
+	ctxt = canvas.getContext("2d");
+	for (var i = 0; i < undoStack.length; i++) {
+		var draw = undoStack[i];
+		if (draw.type == "line") {
+			for (var j = 0; j < draw.data.length; j++) {
+				var lineData = draw.data[j];
+				drawLine(ctxt, lineData.x, lineData.y, lineData.changeX, lineData.changeY, lineData.size, lineData.color);
+			}
+		} else if (draw.type == "point") {
+			drawPoint(ctxt, draw.data.x, draw.data.y, draw.data.r, draw.data.color);
+		} else if (draw.type == "clear") {
+			clearCanvas();
+		}
+	}
+}
+
+function drawPoint(ctxt, centerX, centerY, radius, color) {
+	ctxt.beginPath();
+	ctxt.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+	ctxt.fillStyle = color;
+	ctxt.fill();
+	ctxt.closePath();	
+}
+
+function drawLine(ctxt, x, y, changeX, changeY, size, color) {
+	ctxt.strokeStyle = color;
+	ctxt.lineWidth = size;
+	ctxt.beginPath();
+	ctxt.moveTo(x, y);
+	var newX = x + changeX;
+	var newY = y + changeY;
+	ctxt.lineTo(newX, newY);
+	ctxt.stroke();
+	ctxt.closePath();
 }
 
 $(function(){

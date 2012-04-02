@@ -1,4 +1,7 @@
 {
-  "name": "Sketch",
-  "web_url" : "http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch/index.html"
+  "name": "Sketch (temp)",
+  "web_url" : "http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch/index.html",
+  "obj_actions" : {
+    "picture" : [ "edit" ]
+  }
 }
