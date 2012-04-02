@@ -1,16 +1,12 @@
 /*
  * TicTacToe is the application's main class
  */
- 
-var globalAppContext;
 function MusuWriter(app) {
   this.appContext = app;
 }
 
 var musu;
 Musubi.ready(function(context) {
-
-    globalAppContext = context;
     console.log("launching bigwords.");
     musu = new MusuWriter(context);
 

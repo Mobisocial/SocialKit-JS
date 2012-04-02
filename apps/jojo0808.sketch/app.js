@@ -46,12 +46,16 @@ Musubi.ready(function(appContext) {
   });
   
   $("#clear").click(function(e) {
-	  var canvas = document.getElementById("sketchpad"),
-	  ctxt = canvas.getContext("2d");
-	  ctxt.fillStyle = "white";
-	  ctxt.fillRect(0,0,canvas.width, canvas.height);  
+	clearCanvas();
+	undoStack.push({type: "clear"});
   });
   
+  $("#undo").click(function(e) {
+	undoStack.pop();
+	clearCanvas();
+	redrawFromUndoStack();
+  });
+	
   $("#tool").change(function(e) {
 	var v = $(this).val();
 	if (v == "Pen") {
@@ -126,9 +130,9 @@ var SketchApp = function(options) {
   canvas.width = canvas.offsetWidth;
   canvas.style.width = '';
 
-  canvas.style.height = $(document).height();
+  canvas.style.height = $("body").height();
   canvas.height = canvas.offsetHeight;
-  canvas.style.height = '';
+  //canvas.style.height = '';
 
   Mx = 0;
   My = 0;
@@ -149,6 +153,7 @@ var SketchApp = function(options) {
   }
 
   var lines = [,,];
+  var lineDrawData; // saves line drawing information in a single array 
   var offset = $(canvas).offset();
                
   var self = {
@@ -168,20 +173,21 @@ var SketchApp = function(options) {
 		var centerY = lines[0].y;
 		var radius = parseInt($("#width").val()) / 2;
 		var color = $("#color").css("background-color");
-		ctxt.beginPath();
-		ctxt.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-		ctxt.fillStyle = color;
-		ctxt.fill();
-		ctxt.closePath();
+		drawPoint(ctxt, centerX, centerY, radius, color);
 		
 		// save to undo stack
 		var toStack = { type: "point", data: {x: centerX, y: centerY, r: radius, color: color} };
+		undoStack.push(toStack);
+	  } else {
+		// save line to undo stack
+		var toStack = { type: "line", data: lineDrawData };
 		undoStack.push(toStack);
 	  }
 	  moved = false;
       drawing = false;
     },
     preDraw: function(event) {
+	  lineDrawData = new Array();
       offset = $(canvas).offset();
       if (event.type == "mousedown") {
         drawing = true;
@@ -234,27 +240,18 @@ var SketchApp = function(options) {
     move: function(i, changeX, changeY) {
 	  moved = true;
 	  if (usingEraser) {
-		ctxt.strokeStyle = "#fff";
-	  } else {
-		ctxt.strokeStyle = lines[i].color;
+		lines[i].color = "#fff";
 	  }
-	  ctxt.lineWidth = lines[i].size;
-      ctxt.beginPath();
-      ctxt.moveTo(lines[i].x, lines[i].y);
-      var newX = lines[i].x + changeX;
-      var newY = lines[i].y + changeY;
-      ctxt.lineTo(newX, newY);
-      ctxt.stroke();
-      ctxt.closePath();
+	  drawLine(ctxt, lines[i].x, lines[i].y, changeX, changeY, lines[i].size, lines[i].color);
 	  
 	  // save lines to undo stack
-	  var toStack = { type: "line", data: {x: lines[i].x, y: lines[i].y, 
-											changeX: changeX, changeY: changeY,
-											color: ctxt.strokeStyle,
-											size: lines[i].size}};
-	  undoStack.push(toStack);
+	  var toLineDraw = { x: lines[i].x, y: lines[i].y, 
+						changeX: changeX, changeY: changeY,
+						color: ctxt.strokeStyle,
+						size: lines[i].size };
+	  lineDrawData.push(toLineDraw);
 
-      return { x: newX, y: newY};
+      return { x: lines[i].x + changeX, y: lines[i].y + changeY};
     },
   };
   return self.init();
@@ -271,42 +268,49 @@ function updateBounds(ctxt, ret) {
   my = Math.max(my, 0);  
 }
 
+function clearCanvas() {
+	var canvas = document.getElementById("sketchpad"),
+	ctxt = canvas.getContext("2d");
+	ctxt.fillStyle = "white";
+	ctxt.fillRect(0,0,canvas.width, canvas.height); 
+}
+
 function redrawFromUndoStack() {
-	console.log(undoStack);
 	var canvas = document.getElementById("sketchpad"),
 	ctxt = canvas.getContext("2d");
 	for (var i = 0; i < undoStack.length; i++) {
 		var draw = undoStack[i];
 		if (draw.type == "line") {
-			console.log("line!");
-			//if ( (i + 1) < undoStack.length && undoStack[i + 1].type == "line") {
-				//var changeX = draw.data.x - undoStack[i+1].data.x;
-				//var changeY = draw.data.y - undoStack[i+1].data.y;
-
-				//console.log("drawing line..., " + changeX + ", " + changeY);
-				console.log(draw.data);
-				ctxt.strokeStyle = draw.data.color;
-				ctxt.lineWidth = draw.data.size;
-				ctxt.beginPath();
-				ctxt.moveTo(draw.data.x, draw.data.y);
-				var newX = draw.data.x + draw.data.changeX;
-				var newY = draw.data.y + draw.data.changeY;
-				ctxt.lineTo(newX, newY);
-				ctxt.stroke();
-				ctxt.closePath();
-			//}
+			for (var j = 0; j < draw.data.length; j++) {
+				var lineData = draw.data[j];
+				drawLine(ctxt, lineData.x, lineData.y, lineData.changeX, lineData.changeY, lineData.size, lineData.color);
+			}
 		} else if (draw.type == "point") {
-			var centerX = draw.data.x;
-			var centerY = draw.data.y;
-			var radius = draw.data.r;
-			var color = draw.data.color;
-			ctxt.beginPath();
-			ctxt.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-			ctxt.fillStyle = color;
-			ctxt.fill();
-			ctxt.closePath();			
+			drawPoint(ctxt, draw.data.x, draw.data.y, draw.data.r, draw.data.color);
+		} else if (draw.type == "clear") {
+			clearCanvas();
 		}
 	}
+}
+
+function drawPoint(ctxt, centerX, centerY, radius, color) {
+	ctxt.beginPath();
+	ctxt.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+	ctxt.fillStyle = color;
+	ctxt.fill();
+	ctxt.closePath();	
+}
+
+function drawLine(ctxt, x, y, changeX, changeY, size, color) {
+	ctxt.strokeStyle = color;
+	ctxt.lineWidth = size;
+	ctxt.beginPath();
+	ctxt.moveTo(x, y);
+	var newX = x + changeX;
+	var newY = y + changeY;
+	ctxt.lineTo(newX, newY);
+	ctxt.stroke();
+	ctxt.closePath();
 }
 
 $(function(){
