@@ -29,12 +29,14 @@ Musubi.ready(function(appContext) {
     var copy = document.createElement("canvas");
     var w = Mx - mx;
     var h = My - my;
-    copy.width = w + 20;
-    copy.height = h + 20;
+    var border_h =  Math.min(16, canvas.width - w);  
+    var border_v =  Math.min(16, canvas.height - $("#topbar").height() - h);  
+    copy.width = w + border_h;
+    copy.height = h + border_v;
     var cpx = copy.getContext("2d");
     cpx.fillStyle = "white";
     cpx.fillRect(0,0,copy.width, copy.height);
-    cpx.drawImage(elm, mx, my, w, h, 10, 10, w, h);
+    cpx.drawImage(elm, mx, my, w, h, border_h / 2, border_v / 2, w, h);
     var snapshot = copy.toDataURL();
 
     var json = { "mimeType" : "image/jpeg" };
@@ -92,6 +94,11 @@ Musubi.ready(function(appContext) {
   });
 
   appContext.setBack(function() {
+    if(pickerVisible) {
+       pickerVisible = false;
+       $("#colorpicker").hide();
+       return;
+    }
     $("#confirm").toggle();
   });
 
@@ -121,7 +128,7 @@ function onImageLoaded(img) {
     scaleHeight = canvas.height - barHeight;
     scaleWidth = scaleHeight * aspect;
   }
-  var sy = (canvas.height - scaleHeight - $("#topbar").height()) / 2 + $("#topbar").height();
+  var sy = (canvas.height - scaleHeight) / 2 + barHeight / 2;
   var sx = 0;
 
   mx = sx;

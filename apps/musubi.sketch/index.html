@@ -7,7 +7,7 @@
         <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/jquery-1.5.2.min.js"></script>
         <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch/lib/jpeg_encoder_basic.js"></script>
         <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch/lib/todataurl-jpg.js"></script>
-        <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch.temp/app.js"></script>
+        <script type="text/javascript" src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/apps/musubi.sketch/app.js"></script>
 		<script src="http://debug.phonegap.com/target/target-script-min.js#anonymous"></script>
 
         <style type="text/css">
@@ -39,6 +39,7 @@
 				background-color:#ccc;
             }
             #topbar button {
+		font-size: 1.2em;
 				z-index:100;
             }
 			#undo {
@@ -145,9 +146,10 @@ function pickColor() {
   var color = document.getElementById("divpreview").style.backgroundColor;
   $("#color").css("background-color",color);
 }
-
+var pickerVisible = false;
 function showColorPicker() {
-  $("#colorpicker").css("display","");
+  $("#colorpicker").show();
+  pickerVisible = true;
 }
 
 </script>
