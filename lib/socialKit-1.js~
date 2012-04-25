@@ -16,15 +16,15 @@ SocialKit = {
 Musubi = {
     _contexts: [],
     _launchCallback: null,
-    _launch: function(user, feed, appId, message) {
+    _launch: function(user, feed, appId, obj) {
         if (DBG) console.log("launching socialkit.js app");
-    	Musubi.platform._setConfig({title: document.title});
+        	Musubi.platform._setConfig({title: document.title});
         if (DBG) console.log("preparing musubi context");
-    	var context = new SocialKit.AppContext({appId: appId, feed: feed, user: user, message: message});
+        	var context = new SocialKit.AppContext({appId: appId, feed: feed, user: user, obj: obj});
         if (DBG) console.log("appending context");
-    	Musubi._contexts.push(context);
+    	    Musubi._contexts.push(context);
 
-    	if (Musubi._launchCallback != null) {
+    	    if (Musubi._launchCallback != null) {
             if (DBG) console.log("launching app callback");
             Musubi._launchCallback(context);
             if (DBG) console.log("callback returned.");
@@ -32,26 +32,32 @@ Musubi = {
             if (DBG) console.log("no callback to launch.");
         }
     },
-    
+
     _newMessage: function(msg) {
-    	// Pass on to Feed instance
-    	for (var key in Musubi._contexts) {
-    		var context = Musubi._contexts[key];
-    		if (context.feed.session == msg.feedName) {
-    			context.feed._newMessage(msg);
-    		}
-    	}
+        	// Pass on to Feed instance
+        	for (var key in Musubi._contexts) {
+        		var context = Musubi._contexts[key];
+        		if (context.feed.session == msg.feedName) {
+        			context.feed._newMessage(msg);
+        		}
+        	}
     },
     
     ready: function(callback) {
-    	Musubi._launchCallback = callback
+    	    Musubi._launchCallback = callback;
     },
+
+    
+    urlForRawData: function(objId) {
+      return Musubi.platform._urlForRaw(objId);
+    }
 };
 
 Musubi.platform = {
 	_messagesForFeed: function(feedName, callback) {},
 	_postObjToFeed: function(obj, feedName) {},
-        _urlForRaw: function(universalHash) {},
+    _urlForRaw: function(objId) {},
+    _back: function(objId) {},
 	_setConfig: function(config) {},
 	_log: function(msg) {},
         _quit: function() {}
@@ -72,6 +78,9 @@ if (typeof Musubi_android_platform == "object") {
     _urlForRaw: function(objId) {
       return Musubi_android_platform._urlForRaw(objId);
     },
+    _back: function() {
+      Musubi_android_platform._back();
+    },
     _setConfig: function(config) {
       Musubi_android_platform._setConfig(JSON.stringify(config));
     },
@@ -91,16 +100,38 @@ if (typeof Musubi_android_platform == "object") {
  * AppContext class
  */
 
-SocialKit.AppContext = function(json) {
-    if (DBG) console.log(">>> new AppContext(" + JSON.stringify(json));
-    this.appId = json.appId;
-    this.feed = new SocialKit.Feed(json.feed);
-    this.message = json.message ? new SocialKit.SignedMessage(json.message) : null;
-    this.user = json.user;
-    this.quit = function() { Musubi.platform._quit(); }
+SocialKit.AppContext = function(data) {
+    if (DBG) console.log(">>> new AppContext(" + JSON.stringify(data));
+    this.appId = data.appId;
+    this.feed = new SocialKit.Feed(data.feed);
+    this.obj = data.obj ? new SocialKit.DbObj(data.obj) : null;
+    this.user = data.user;
+    this.forceQuit = false;
+    this.overwriteBack = false;
+    this.quit = function() { 
+                    this.forceQuit = true; 
+                    Musubi.platform._quit(); 
+                };
+    this.realBack = function() { this.quit(); };
+    this.back = function() {
+                    this.realBack();
+                    if(!this.forceQuit && !this.overwriteBack) { 
+                        Musubi.platform._back(); 
+                    } 
+                };
     if (DBG) console.log("AppContext prepared.");
 };
 
+SocialKit.AppContext.prototype.setBack = function(newSetBack) { 
+    this.overwriteBack = true;
+    this.realBack = function() { 
+        newSetBack();
+        if(!this.forceQuit) { 
+            Musubi.platform._back(); 
+        } 
+    }; 
+};
+                    
 SocialKit.AppContext.prototype.toString = function() {
     return "<AppContext: " + this.appId + "," + this.feed.toString() + "," + this.message.toString() + ">";
 };
@@ -186,23 +217,24 @@ SocialKit.Obj.prototype.toString = function() {
  * Message class
  */
 
-SocialKit.Message = function(json) {
-    this.obj = null;
+SocialKit.DbObj = function(json) {
     this.sender = null;
     this.recipients = [];
     this.appId = null;
     this.feedName = null;
     this.date = null;
-    
-    if (json)
+
+    if (json) {
         this.init(json);
+    }
 };
 
-SocialKit.Message.prototype.init = function(json) {
-    if (DBG) console.log("Message(" + JSON.stringify(json));
-    this.obj = new SocialKit.Obj(json.obj);
+SocialKit.DbObj.prototype.init = function(json) {
+    if (DBG) console.log("DbObj(" + JSON.stringify(json));
     this.sender = new SocialKit.User(json.sender);
     this.recipients = [];
+    this.objId = json.objId;
+    this.data = json.data;
     
     for (var key in json.recipients) {
         this.members.push( new SocialKit.User(json.recipients[key]) );
@@ -213,12 +245,12 @@ SocialKit.Message.prototype.init = function(json) {
     this.date = new Date(parseInt(json.timestamp));
 };
 
-SocialKit.Message.prototype.toString = function() {
-    return "<Message: " + this.obj.toString() + "," + this.sender.toString() + "," + this.appId + "," + this.feedName + "," + this.date + ">";
+SocialKit.DbObj.prototype.toString = function() {
+    return "<DbObj: " + this.objId + "," + this.sender.toString() + "," + this.appId + "," + this.feedName + "," + ((this.data != null) ? JSON.stringify(this.data) : null) + ">";
 };
 
 /*
- * SignedMessage class
+ * SignedMessage class TODO: Deprecated?
  */
 
 SocialKit.SignedMessage = function(json) {
