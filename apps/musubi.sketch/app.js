@@ -25,6 +25,7 @@ Musubi.ready(function(appContext) {
   sketch = new SketchApp(args); 
 
   $("#post").click(function(e) {
+    $("#post").attr("disabled","disabled");
     var elm = document.getElementById('sketchpad');
     var copy = document.createElement("canvas");
     var w = Mx - mx;
