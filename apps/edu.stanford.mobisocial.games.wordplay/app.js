@@ -350,6 +350,11 @@ WordPlay.prototype.renderRack = function() {
                 tile.css("width", "40px");
                 tile.css("height", "40px");
                 lastPosition = {x: event.pageX, y: event.pageY};
+                
+                var newSpot = thisGame.spotForPoint(lastPosition.x, lastPosition.y);
+                if (newSpot != currentSpot) {
+                	// move whatever is at current spot towards
+                } 
             });
             tile.bind('dragend', function (event, options) {
             	tile.css("top", "");
@@ -366,9 +371,13 @@ WordPlay.prototype.renderRack = function() {
             		newSpot = thisGame.spotForPoint(lastPosition.x, lastPosition.y);
             		if (newSpot >= 0) {
             			console.log("Moving to spot " + newSpot);
+            			
+            			
+            		} else {
+            			spot.append(tile);
+            			tile.data("position", null);
             		}
-            		spot.append(tile);
-	            	tile.data("position", null);
+	            	
             	}
             	
             	console.log(thisGame.placement());
