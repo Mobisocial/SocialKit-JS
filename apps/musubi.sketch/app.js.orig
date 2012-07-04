@@ -178,7 +178,7 @@ var SketchApp = function(options) {
   ctxt.fillRect(0,0,canvas.width, canvas.height);
 
   if (options.bg) {
-    $("body").append("<img id='backgroundImage' src='"+options.bg+"' onload='onImageLoaded(this)' style='display:none;' />");
+    $("body").append("<img src='"+options.bg+"' onload='onImageLoaded(this)' style='display:none;' />");
   }
 
   var lines = [,,];
@@ -310,9 +310,6 @@ function clearCanvas() {
 	ctxt = canvas.getContext("2d");
 	ctxt.fillStyle = "white";
 	ctxt.fillRect(0,0,canvas.width, canvas.height); 
-    if ($("#backgroundImage").length > 0) {
-        onImageLoaded($("#backgroundImage")[0]);
-    }
 }
 
 function redrawFromUndoStack() {
