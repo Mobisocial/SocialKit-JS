@@ -1,7 +1,7 @@
 /**
  * Musu Sketch
  */
-var testingInBrowser = false;
+var testingInBrowser = true;
 
 var sketch; // Global context for SketchApp.
 var mx = 0; // TODO: someone with "javascript skills" should make this object oriented.
@@ -15,7 +15,7 @@ var undoStack = new Array();
 Musubi.ready(function(appContext) {
   canvas = document.getElementById("sketchpad");
   var args = {id:"sketchpad", size: parseInt($("#width").val()), color: $("#color").css("background-color") };
-  if (appContext.obj != null) {
+  if (appContext != null && appContext.obj != null) {
     var img = Musubi.urlForRawData(appContext.obj.objId);
     if (img != null) {
       args.bg = img;
@@ -93,18 +93,19 @@ Musubi.ready(function(appContext) {
     $("#confirm").hide();
   });
   var postDialogVisible = false;
-  appContext.setBack(function() {
-    if(pickerVisible) {
-       pickerVisible = false;
-       $("#colorpicker").hide();
-       return;
-    }
-    if(postDialogVisible == false && mx >= Mx && my >= My) {
-      appContext.quit();
-    }
-    $("#confirm").toggle();
-  });
-
+  if (!testingInBrowser) {
+    appContext.setBack(function() {
+      if(pickerVisible) {
+         pickerVisible = false;
+         $("#colorpicker").hide();
+         return;
+      }
+      if(postDialogVisible == false && mx >= Mx && my >= My) {
+        appContext.quit();
+      }
+      $("#confirm").toggle();
+    });
+  }
   $("#color").click(function(e) {
     showColorPicker();
   });
