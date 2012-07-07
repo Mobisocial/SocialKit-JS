@@ -1,7 +1,7 @@
 /**
  * Musu Sketch
  */
-var testingInBrowser = true;
+var testingInBrowser = false;
 
 var sketch; // Global context for SketchApp.
 var mx = 0; // TODO: someone with "javascript skills" should make this object oriented.
