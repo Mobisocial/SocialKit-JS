@@ -2,9 +2,9 @@
 <head>
 	<script type="text/javascript" src="../jquery-1.5.2.min.js"></script>
 	
-	<script type="text/javascript" src="../lib/socialKit.js"></script>
+	<script type="text/javascript" src="../lib/socialKit-1.js"></script>
 	<script type="text/javascript" src="../lib/turnBasedGame.js"></script>
-	
+	<!-- 
 	<script type="text/javascript" src="rsa/bigint.js"> </script>
 	<script type="text/javascript" src="rsa/barrett.js"> </script>
 	<script type="text/javascript" src="rsa/rsa.js"> </script>
@@ -12,7 +12,7 @@
 	<script type="text/javascript" src="crypto-js/crypto-sha1-hmac-pbkdf2-blockmodes-aes.js"> </script>
 	<script type="text/javascript" src="musubi/web_socket.js"> </script>
 	<script type="text/javascript" src="musubi/transport.js"> </script>
-	<script type="text/javascript" src="musubi/messageFormat.js"> </script>
+	<script type="text/javascript" src="musubi/messageFormat.js"> </script> -->
 	<script type="text/javascript" src="../lib/platforms/socialKit-browser.js"></script>
 	
 	<style type="text/css">
@@ -44,15 +44,14 @@
 	<div style="clear: both;"></div>
 	
 	<input type="button" onclick="addUser()" value="Add user/device" style="margin-top: 20px"/>
-	<input type="text" id="appId" value="edu.stanford.mobisocial.games.wordplay" style="width: 300px"></input><input type="button" onclick="launch($('#appId').val())" value="Launch"/>
+	<input type="text" id="appId" value="musubi.sketch" style="width: 300px"></input><input type="button" onclick="launch($('#appId').val())" value="Launch"/>
 	<a href="http://bjdodson.com/musubi/htmlwriter/" target="_BLANK">html editor</a>
 	<script type="text/javascript">
 		var env = new Musubi.Browser.Environment(new Musubi.Browser.InterFrameTransport('test'));
-		var feed = {name: "Test", uri: "", session: "test", key: ""};
+		var feed = {name: "Test", session: "test"};
 		
 		addUser();
 		addUser();
-		
 		
 		function addUser() {
 			var id = $(".device").length;
@@ -67,6 +66,15 @@
 			var user = {name: "User 1", id: 0};
 			env.startInstance('view0', user, feed, appId);
 		}
+		
+		var query = location.search;
+		if (query.indexOf('app=') > -1) {
+			app = query.substring(query.indexOf('app=') + 4);
+			if (app.indexOf('&') > -1)
+				app = app.substring(0, app.indexOf('&'));
+			$('#appId').val(app);
+		}
+		
 	</script>
 </body>
 

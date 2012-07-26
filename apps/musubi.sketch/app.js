@@ -194,6 +194,9 @@ var SketchApp = function(options) {
       canvas.addEventListener('touchstart', self.preDraw, false);
       canvas.addEventListener('touchmove', self.draw, false);
 	  canvas.addEventListener('touchend', self.postDraw, false);
+	  canvas.addEventListener('mousedown', self.preDraw, false);
+      canvas.addEventListener('mousemove', self.draw, false);
+	  canvas.addEventListener('mouseup', self.postDraw, false);
 
       return this;
     },
@@ -225,6 +228,7 @@ var SketchApp = function(options) {
       drawing = false;
     },
     preDraw: function(event) {
+    	console.log("PRE")
 	  lineDrawData = new Array();
       offset = $(canvas).offset();
       if (event.type == "mousedown") {
