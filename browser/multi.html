@@ -48,7 +48,7 @@
 	<a href="http://bjdodson.com/musubi/htmlwriter/" target="_BLANK">html editor</a>
 	<script type="text/javascript">
 		var env = new Musubi.Browser.Environment(new Musubi.Browser.InterFrameTransport('test'));
-		var feed = {name: "Test", session: "test"};
+		var feed = {name: "Test", session: "test", members: []};
 		
 		addUser();
 		addUser();
@@ -57,6 +57,7 @@
 			var id = $(".device").length;
 			var frame = 'view' + id;
 			var user = {name: "User " + (id + 1), id: id};
+			feed.members[feed.members.length] = user; 
 			
 			$("#devices").append('<div class="device"><iframe name="' + frame + '"></iframe></div>');
 			env.startInstance(frame, user, feed, 'edu.stanford.mobisocial.dungbeetle');

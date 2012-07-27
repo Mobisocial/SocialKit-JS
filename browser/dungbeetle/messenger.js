@@ -57,7 +57,7 @@ function HtmlUpdate(obj) {
 HtmlUpdate.prototype.render = function() {
 	var obj = this.obj;
 	
-    html = $(obj.data.__html);
+    html = $(obj.json.__html);
     html.css('cursor', 'pointer');
     html.click(function() { Musubi._launchApp(obj.appId, obj) });
     return html;
@@ -69,14 +69,14 @@ UpdateFactory = {}
 
 UpdateFactory.createUpdateForObj = function(obj) {
 	if (obj.type == "status")
-        return new StatusUpdate(obj.data);
+        return new StatusUpdate(obj.json);
     else if (obj.type == "join_notification")
-        return new JoinNotificationUpdate(obj.data);
+        return new JoinNotificationUpdate(obj.json);
     else if (obj.type == "picture")
         return new PictureUpdate(obj);
     else if (obj.type == "appstate")
-        return new AppStateUpdate(obj.data);
-    else if (obj.data.__html)
+        return new AppStateUpdate(obj.json);
+    else if (obj.json && obj.json.__html)
     	return new HtmlUpdate(obj)
 };
 

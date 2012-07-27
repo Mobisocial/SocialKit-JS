@@ -1,0 +1,130 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>Truth or Dare - is this working</title> 
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+	<link rel="stylesheet" href="http://jquerymobile.com/test/css/themes/default/jquery.mobile.css"/>
+	<link rel="stylesheet" href="http://jquerymobile.com/test/docs/_assets/css/jqm-docs.css"/>
+	
+	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<script src="http://jquerymobile.com/test/js/jquery.mobile.js"></script>
+	<script src="http://jquerymobile.com/test/docs/_assets/js/jqm-docs.js"></script>
+
+	<script src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/lib/socialKit-1.js"></script>
+	<script src="app.js"></script>
+	
+    <style>
+		.start {display:inline;} .about {display:none;} .input {display:none;} .choice{display:none;} .truth_page{display:none;} .dare_page{display:none;} .dashboard{display:none;} .done_div{display:none;} .img_viewer{display:none;}
+	</style>
+</head> 
+<body> 
+<div data-role="page" data-theme="a">
+	<div data-role="header" data-theme="d" >
+		<img style="float:left" src="http://mobisocial.stanford.edu/musubi/public/img/logo.png" height="30px" width="150px" />
+		<h1></h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+			<div class="start">
+				<center>
+					<img src="header_1.png" height="100px" width="500px"/><br/>
+ 					<a href="#" id="start" data-role="button" data-inline="true" data-icon="star" data-theme="b">&nbsp;Start Game!&nbsp;</a><br/>
+ 					<a href="#" id="about" data-role="button" data-inline="true" data-icon="info" data-theme="b">About Game</a>
+				</center>
+			</div>
+			<div class="about">
+				<center>
+					<h1>About</h1>
+						Welcome to Musubi Truth or Dare! Each user in the feed will submit their own Truth and Dare; once everybody has finished, the game will randomly assign tasks to the players. To complete a truth, simply answer the question; to complete a dare, upload a picture of you completing the dare. It's that simple, enjoy!
+						<br />Remember to install our app if you want play through an entire game!
+					<br/><br />
+					<a href="#" id="return" data-role="button" data-inline="true" data-theme="b">Return</a>
+					<br/><br/>
+					Developed by <a href="mailto:divyahansg@gmail.com">Divyahans Gupta</a> and <a href="mailto:nikhil.narayen@gmail.com">Nikhil Narayen</a>
+				</center>
+			</div>
+			<div class="input">
+				<center>
+					<br/>
+					<div data-role="fieldcontain">
+    					<label for="truth_box">Enter a Truth: &nbsp;&nbsp;</label>
+    					<input type="text" name="truth_box" id="truth" value="" placeholder="e.g. What is your darkest secret?" />
+    					<br />
+	    				<label for="dare_box">Enter a Dare: &nbsp;&nbsp;&nbsp;</label>
+    					<input type="text" name="dare_box" id="dare" value="" placeholder="e.g. Lick a tree" />
+					</div>	
+ 					<a href="#" id="submit" data-role="button" data-inline="true" data-theme="b">Submit</a>
+				</center>
+			</div>
+			<div class="choice">
+				<center>
+					<h1>Choose Your First Task!</h1> 
+					<br/>
+ 						<a href="#" id="truth_button" data-role="button" data-inline="true" data-theme="b"><h3>Truth</h3></a>
+ 						&nbsp;&nbsp;
+ 						<a href="#" id="dare_button" data-role="button" data-inline="true" data-theme="b"><h3>Dare</h3></a>
+				</center>
+			</div>
+			<div class="truth_page">
+				<center>
+					<h1>Your Current Truth is:</h1> 
+					<div id="current_truth"></div>
+					<div data-role="fieldcontain">
+    					<label for="answer_box">Enter an Answer: &nbsp;&nbsp;&nbsp;</label>
+    					<input type="text" name="answer_box" id="truth_answer" value="" placeholder="e.g. I like Suzy." />
+    				</div>
+					<a href="#" id="submit_truth" data-role="button" data-inline="true" data-theme="b">Submit</a>
+				</center>
+			</div>
+			<div class="dare_page">
+				<center>
+					<h1>Your Current Dare is:</h1> 
+					<div id="current_dare"></div>
+					<br />
+					<form enctype="multipart/form-data" method="post">  
+  						<input type="file" id="files" height="50px" width="150px"></input>
+					</form>	
+					<a href="#" id="submit_dare" data-role="button" data-inline="true" data-theme="b">Submit</a>&nbsp;&nbsp;
+					<a href="#" id="rotate" data-role="button" data-inline="true" data-theme="b">Rotate</a>
+					<br/>
+					<canvas id="dare_img" img_src="" height="100px" width="100px"></canvas>
+				</center>
+			</div>
+			<div class="dashboard">
+				<center>
+					<h1>Dashboard</h1><br />
+				</center>
+				
+				<ul data-role="listview" data-theme="d" data-divider-theme="a" id="truth_list">
+					<li data-role="list-divider">Completed Truths</li>
+				</ul>
+				
+				<br/><br/>
+				
+				<ul data-role="listview" data-theme="d" data-divider-theme="a" id="dare_list">
+					<li data-role="list-divider" >Completed Dares</li>
+				</ul>
+				<br/><br/>
+				<center>
+					<a href="#" id="refresh" data-role="button" data-inline="true" data-theme="b">Refresh</a>&nbsp;&nbsp;
+					<div class="done_div">
+						<a href="#" id="done_button" data-role="button" data-inline="true" data-theme="b">Quit!</a>&nbsp;&nbsp;
+						<br />
+						<a href="#" id="new_game" data-role="button" data-inline="true" data-theme="b">Start a New Game!</a>
+					</div>
+				</center>
+			</div>	
+			<div class="img_viewer">
+				<center>
+					<canvas id="picture" style="border:3px solid #000"></canvas>
+					<br/>
+					<a href="#" id="back_button" data-role="button" data-inline="true" data-theme="b">Back</a>
+				</center>
+			</div>	
+	</div><!-- /content -->
+</div><!-- /page -->
+
+</body>
+</html>
