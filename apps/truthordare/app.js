@@ -357,6 +357,7 @@ Musubi.ready(function(context) {
 			var temp_user_obj = new SocialKit.Obj(users[i]); //creating Obj of user
 			var name = temp_user_obj.json['name']; //getting name			
 			var temp_progress = temp_user_dbobj.query("type='progress'"); //getting current state of user
+			console.log(temp_progress);
 			if (temp_progress.length == 3) //if done
 			{
 				var done_obj = new SocialKit.Obj(temp_progress[2]); //getting done object
