@@ -1,0 +1,127 @@
+<!DOCTYPE html> 
+<html> 
+	<head>  
+	<title>APSUH Crossword</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+	<link rel="stylesheet" href="http://jquerymobile.com/test/css/themes/default/jquery.mobile.css"/>
+	<link rel="stylesheet" href="http://jquerymobile.com/test/docs/_assets/css/jqm-docs.css"/>
+
+	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<script src="http://jquerymobile.com/test/js/jquery.mobile.js"></script>
+	<script src="http://jquerymobile.com/test/docs/_assets/js/jqm-docs.js"></script>
+
+	<script src="http://mobisocial.stanford.edu/musubi/apps/SocialKit-JS/lib/socialKit-1.js"></script>
+	<script src="app.js"></script>
+	
+    <style>
+		.start {display:inline;} .crossword {display:none;} .input {display:none;} .choice{display:none;} .truth_page{display:none;} .dare_page{display:none;} .dashboard{display:none;} .done_div{display:none;} .img_viewer{display:none;}
+	</style>
+</head> 
+<body> 
+<div data-role="page" data-theme="a">
+	<div data-role="header" data-theme="d" >
+		<img style="float:left" src="http://mobisocial.stanford.edu/musubi/public/img/logo.png" height="30px" width="150px" />
+		<h1></h1>
+		</div><!-- /header -->
+		
+			<div class="start">
+				<center>
+					<img src="http://neelguha.github.com/musubi-crossword/musubi/apps/ap-us-history.jpeg" height="100px" width="500px"/><br/>
+			       Please select your crossword then
+				return to the feed and click the US
+				History Icon to start your Crossword!
+			  <button id = "apush"> AP US History Crossword!</button>
+			  <button id = "stanford"> Stanford History Crossword <button>
+			    </center>
+			</div>
+			
+			
+			<div class = "crossword">
+				<center>
+					<h1>AP US History Crossword</h1>
+					<a href="#" id="crossd" data-role="button" data-inline="true" data-theme="b">Crossword</a>	
+				</center>
+			</div>
+			
+			
+			<!--<div class="input">
+				<center>
+					<br/>
+					<div data-role="fieldcontain">
+    					<label for="truth_box">Enter a Truth: &nbsp;&nbsp;</label>
+    					<input type="text" name="truth_box" id="truth" value="" placeholder="e.g. What is your darkest secret?" />
+    					<br />
+	    				<label for="dare_box">Enter a Dare: &nbsp;&nbsp;&nbsp;</label>
+    					<input type="text" name="dare_box" id="dare" value="" placeholder="e.g. Lick a tree" />
+					</div>	
+ 					<a href="#" id="submit" data-role="button" data-inline="true" data-theme="b">Submit</a>
+				</center>
+			</div>
+			<div class="choice">
+				<center>
+					<h1>Choose Your First Task!</h1> 
+					<br/>
+ 						<a href="#" id="truth_button" data-role="button" data-inline="true" data-theme="b"><h3>Truth</h3></a>
+ 						&nbsp;&nbsp;
+ 						<a href="#" id="dare_button" data-role="button" data-inline="true" data-theme="b"><h3>Dare</h3></a>
+				</center>
+			</div>
+			<div class="truth_page">
+				<center>
+					<h1>Your Current Truth is:</h1> 
+					<div id="current_truth"></div>
+					<div data-role="fieldcontain">
+    					<label for="answer_box">Enter an Answer: &nbsp;&nbsp;&nbsp;</label>
+    					<input type="text" name="answer_box" id="truth_answer" value="" placeholder="e.g. I like Suzy." />
+    				</div>
+					<a href="#" id="submit_truth" data-role="button" data-inline="true" data-theme="b">Submit</a>
+				</center>
+			</div> 
+			<div class="dare_page">
+				<center>
+					<h1>Your Current Dare is:</h1> 
+					<div id="current_dare"></div>
+					<br />
+					<form enctype="multipart/form-data" method="post">  
+  						<h2>Regular file upload</h2>  
+  						<input type="file" id="files" height="50px" width="150px"></input>
+					</form>	
+					<a href="#" id="submit_dare" data-role="button" data-inline="true" data-theme="b">Submit</a>
+					<div id="dare_img"></div>
+				</center>
+			</div>
+			<div class="dashboard">
+				<center>
+					<h1>Dashboard</h1><br />
+				</center>
+				
+				<ul data-role="listview" data-theme="d" data-divider-theme="a" id="truth_list">
+					<li data-role="list-divider">Completed Truths</li>
+				</ul>
+				
+				<br/><br/> 
+				
+				<ul data-role="listview" data-theme="d" data-divider-theme="a" id="dare_list">
+					<li data-role="list-divider" >Completed Dares</li>
+				</ul>
+				<br/><br/>
+				<center>
+					<a href="#" id="refresh" data-role="button" data-inline="true" data-theme="b">Refresh</a>&nbsp;&nbsp;
+					<div class="done_div">
+						<a href="#" id="done_button" data-role="button" data-inline="true" data-theme="b">Quit!</a>
+					</div>
+				</center>
+			</div> -->
+			<div class="img_viewer">
+				<center>
+					<canvas id="picture" style="border:1px solid #000"></canvas>
+					<br/>
+					<a href="#" id="back_button" data-role="button" data-inline="true" data-theme="b">Back</a>
+				</center>
+			</div>	
+	</div><!-- /content -->
+</div><!-- /page -->
+
+</body>
+</html>

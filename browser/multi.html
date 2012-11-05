@@ -47,6 +47,14 @@
 	<input type="text" id="appId" value="musubi.sketch" style="width: 300px"></input><input type="button" onclick="launch($('#appId').val())" value="Launch"/>
 	<a href="http://bjdodson.com/musubi/htmlwriter/" target="_BLANK">html editor</a>
 	<script type="text/javascript">
+		if (navigator.userAgent.indexOf("Firefox") != -1) {
+			try {
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
+			} catch (e) {
+				console.err(e);
+			}
+		}
+	
 		var env = new Musubi.Browser.Environment(new Musubi.Browser.InterFrameTransport('test'));
 		var feed = {name: "Test", session: "test", members: []};
 		
